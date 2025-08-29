@@ -28,7 +28,7 @@ jobs:
         run: echo deployed to staging!
 
   deploy-prod:
-    environment: prod
+    environment: production
     runs-on: ubuntu-latest
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
