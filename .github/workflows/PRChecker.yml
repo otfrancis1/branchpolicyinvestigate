@@ -1,0 +1,39 @@
+name: PR Validation - Build and Test
+on:
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  SOLUTION_FILE_PATH: '.'
+  BUILD_CONFIGURATION: Release
+
+jobs:
+  validate-pr:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Validate PR Title Format
+      id: validate_title
+      run: |
+        $prTitle = "${{ github.event.pull_request.title }}"
+        Write-Output "PR Title: $prTitle"
+        
+        if ($prTitle -match "^\[([A-Z]{3,4}\d{7})\]") {
+          $reference = $matches[1]
+          echo "reference=$reference" >> $env:GITHUB_OUTPUT
+          Write-Output "✅ Valid ServiceNow reference found: $reference"
+        } else {
+          Write-Output "❌ ERROR: PR title must start with ServiceNow reference in format [RITM1234567]"
+          Write-Output "Current PR title: $prTitle"
+          Write-Output "Expected format: [RITM1234567] Your PR description"
+          exit 1
+        }
+      shell: powershell
+
+    - name: PR Validation Summary
+      run: |
+        Write-Output "🎉 PR Validation Complete!"
+        Write-Output "ServiceNow Reference: ${{ steps.validate_title.outputs.reference }}"
+        Write-Output ""
+        Write-Output "This PR is ready to merge into main!"
+      shell: powershell
